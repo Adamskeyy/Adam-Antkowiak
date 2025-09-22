@@ -1,59 +1,113 @@
-# ProffeoTask
+Angular Application Implementation Plan
+This document presents a detailed implementation plan for a post management application in Angular 20. The plan includes the architecture, directory structure, list of components, services, and state management approach, taking into account all project requirements.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.6.
+1. Directory Structure
+   The application will be organized according to the feature-first convention, with separate core, shared, and features areas for better clarity and scalability.
 
-## Development server
+```
+src/
+├── app/
+│   ├── core/                  # Services and logic that operate globally in the application
+│   │   ├── services/
+│   │   │   └── posts-store.service.ts  # Singleton for storing post data
+│   │   └── core.routes.ts
+│   ├── features/              # Lazy-loaded modules
+│   │   ├── posts/
+│   │   │   ├── posts-list/
+│   │   │   │   └── posts-list.component.ts
+│   │   │   ├── post-details/
+│   │   │   │   └── post-details.component.ts
+│   │   │   ├── posts.routes.ts
+│   │   │   └── posts.service.ts  # HTTP request handling
+│   │   └── favorites/
+│   │       ├── favorites.component.ts
+│   │       └── favorites.routes.ts
+│   ├── shared/                # Reusable components, pipes, and directives
+│   │   ├── components/
+│   │   │   ├── loader/
+│   │   │   │   └── loader.component.ts
+│   │   │   ├── post-card/
+│   │   │   │   └── post-card.component.ts
+│   │   │   ├── user-details/
+│   │   │   │   └── user-details.component.ts
+│   │   │   └── filter/
+│   │   │       └── filter.component.ts
+│   │   └── pipes/
+│   │       └── content-excerpt.pipe.ts
+│   ├── app.component.ts
+│   └── app.routes.ts
+├── environments/
+├── styles.css                # Global TailwindCSS styles
+└── main.ts
 
-To start a local development server, run:
-
-```bash
-ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+2. Component List
+   AppComponent: The main component containing the router outlet.
 
-## Code scaffolding
+   PostsListComponent (features/posts/posts-list): Displays a list of posts with titles and content excerpts. It will use PostCardComponent. It will implement filtering.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+   PostDetailsComponent (features/posts/post-details): Displays the full post content, author data, and comments list. It will use UserDetailsComponent.
 
-```bash
-ng generate component component-name
-```
+   FavoritesComponent (features/favorites): A component for displaying a list of favorite posts.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+   PostCardComponent (shared/components/post-card): A reusable component for displaying a single post on the list. It will contain a button to mark a post as a favorite (toggle).
 
-```bash
-ng generate --help
-```
+   UserDetailsComponent (shared/components/user-details): A component for displaying information about the post's author.
 
-## Building
+   FilterComponent (shared/components/filter): A UI component for handling post filtering (by content and by user).
 
-To build the project run:
+   LoaderComponent (shared/components/loader): Will display a spinner or skeleton while loading data from the API.
 
-```bash
-ng build
-```
+3. Services
+   PostsService:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+   Used for direct communication with the external API https://jsonplaceholder.typicode.com.
 
-## Running unit tests
+   Will contain methods for fetching posts, users, and comments, using HttpClient and RxJS.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+   Methods: getPosts(userId?: number): Observable<Post[]>, getPost(id: number): Observable<Post>, getUser(id: number): Observable<User>, getComments(postId: number): Observable<Comment[]>.
 
-```bash
-ng test
-```
+   PostsStoreService (Singleton):
 
-## Running end-to-end tests
+   The central cache of the application.
 
-For end-to-end (e2e) testing, run:
+   Stores post data in signals (posts: WritableSignal<Post[]>, favorites: WritableSignal<number[]>).
 
-```bash
-ng e2e
-```
+   Provides logic to check if post data is already available in memory. If so, it returns it from the signal. If not, it calls a method from PostsService and updates the signal.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+   Data refresh only occurs when filters change or the page is reloaded.
 
-## Additional Resources
+   It will also manage the state of favorite posts.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+4. State Management Approach
+   State management will be based on two pillars:
+
+   Signals: Used to manage state within components (e.g., loading state, UI element visibility) and to store data in the singleton PostsStoreService. Thanks to signals, components will automatically react to state changes.
+
+   Singleton Service (PostsStoreService):
+
+   All data that needs to be available in multiple places and that needs to be cached will be stored in this service.
+
+   Components, instead of fetching data directly from the API, will retrieve it from PostsStoreService.
+
+   This service will decide whether a new API request is needed.
+
+   Favorite posts will be stored in a signal favorites: WritableSignal<number[]> within this service.
+
+   zoneless Architecture: Using provideZonelessChangeDetection() in main.ts will ensure optimization and efficient UI rendering based on signals.
+
+   Additional Notes:
+   Asynchronicity: We will use RxJS to handle HTTP requests and data streams, and HttpClient for API requests.
+
+   Filtering:
+
+   Filtering by post content (filter by content) will be implemented on the frontend side.
+
+   Filtering by user (filter by user) will use the userId parameter in the API request.
+
+   Filtering by favorites will be based on the state stored in PostsStoreService.
+
+   Animations: At least one transition animation (enter/leave) will be applied, e.g., for the post list container or the details view.
+
+   Responsiveness: The application will be fully responsive, using flexbox and responsive classes provided by TailwindCSS to ensure correct display on mobile and desktop devices.
