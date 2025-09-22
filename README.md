@@ -1,106 +1,87 @@
-Angular Application Implementation Plan
-This document presents a detailed implementation plan for a post management application in Angular 20. The plan includes the architecture, directory structure, list of components, services, and state management approach, taking into account all project requirements.
+# Angular Application Implementation Plan
 
-1. Directory Structure
-   The application will be organized according to the feature-first convention, with separate core, shared, and features areas for better clarity and scalability.
+This document presents a detailed implementation plan for a post management application in Angular. The plan outlines the architecture, directory structure, list of components and services, and state management approach, taking into account all project requirements and a feature-first organization.
 
-```
-src/
-├── app/
-│   ├── core/                  # Services and logic that operate globally in the application
-│   │   ├── services/
-│   │   │   └── posts-store.service.ts  # Singleton for storing post data
-│   │   └── core.routes.ts
-│   ├── features/              # Lazy-loaded module
-│   │   ├── posts/
-│   │   │   ├── posts-list/
-│   │   │   │   └── posts-list.component.ts
-│   │   │   ├── post-details/
-│   │   │   │   └── post-details.component.ts
-│   │   │   ├── posts.routes.ts
-│   │   │   └── posts.service.ts  # HTTP request handling
-│   ├── shared/                # Reusable components, pipes, and directives
-│   │   ├── components/
-│   │   │   ├── loader/
-│   │   │   │   └── loader.component.ts
-│   │   │   └── filter/
-│   │   │       └── filter.component.ts
-│   │   └── pipes/
-│   │       └── content-excerpt.pipe.ts
-│   ├── app.component.ts
-│   └── app.routes.ts
-├── index.html
-├── styles.css
-└── main.ts
+## Directory Structure
+
+The application is structured for clarity and scalability, with separate core, shared, and features areas. The final, implemented structure is as follows:
 
 ```
+.
+├── src/
+│   ├── app/
+│   │   ├── app.config.ts
+│   │   ├── app.css
+│   │   ├── app.html
+│   │   ├── app.routes.ts
+│   │   ├── app.spec.ts
+│   │   ├── app.ts
+│   │   │
+│   │   ├── core/
+│   │   │   └── services/
+│   │   │       └── posts-store.service.ts
+│   │   │
+│   │   ├── features/
+│   │   │   └── posts/
+│   │   │       ├── post-details/
+│   │   │       │   ├── post-details.html
+│   │   │       │   └── post-details.ts
+│   │   │       │
+│   │   │       ├── posts-list/
+│   │   │       │   ├── posts-list.css
+│   │   │       │   ├── posts-list.html
+│   │   │       │   └── posts-list.ts
+│   │   │       │
+│   │   │       ├── posts.model.ts
+│   │   │       ├── posts.routes.ts
+│   │   │       └── posts.service.ts
+│   │   │
+│   │   └── shared/
+│   │       └── components/
+│   │           └── loader/
+│   │               ├── loader.html
+│   │               └── loader.ts
+│   │
+│   ├── index.html
+│   ├── main.ts
+│   └── styles.css
+├── angular.json
+├── package.json
+└── README.md
+```
 
-2. Component List
-   AppComponent: The main component containing the router outlet.
+## Component List
 
-   PostsListComponent (features/posts/posts-list): Displays a list of posts with titles and content excerpts. It will use PostCardComponent. It will implement filtering.
+AppComponent: The main component containing the router outlet.
 
-   PostDetailsComponent (features/posts/post-details): Displays the full post content, author data, and comments list. It will use UserDetailsComponent.
+PostsListComponent (features/posts/posts-list): Displays a list of posts with titles and content excerpts. It implements client-side filtering and uses the Loader component.
 
-   FavoritesComponent (features/favorites): A component for displaying a list of favorite posts.
+PostDetailsComponent (features/posts/post-details): Displays the full post content, author data, and a list of comments.
 
-   PostCardComponent (shared/components/post-card): A reusable component for displaying a single post on the list. It will contain a button to mark a post as a favorite (toggle).
+LoaderComponent (shared/components/loader): Displays a spinner while loading data from the API.
 
-   UserDetailsComponent (shared/components/user-details): A component for displaying information about the post's author.
+## Services
 
-   FilterComponent (shared/components/filter): A UI component for handling post filtering (by content and by user).
+PostsService: This service is responsible for direct communication with the external API https://jsonplaceholder.typicode.com. It contains methods for fetching posts, users, and comments using HttpClient and RxJS.
 
-   LoaderComponent (shared/components/loader): Will display a spinner or skeleton while loading data from the API.
+PostsStoreService (Singleton): This is the central cache of the application. It stores post data and favorite post IDs in signals. This service provides logic to check if data is already in memory before making an API call, optimizing performance. Data is refreshed only when filters change or the page is reloaded. It also manages the state of favorite posts, ensuring they are preserved across sessions.
 
-3. Services
-   PostsService:
+## State Management Approach
 
-   Used for direct communication with the external API https://jsonplaceholder.typicode.com.
+The application's state management is based on a modern, reactive approach:
 
-   Will contain methods for fetching posts, users, and comments, using HttpClient and RxJS.
+Signals: Signals are used to manage state within components (e.g., loading state, UI element visibility) and to store data in the singleton PostsStoreService. Components automatically react to state changes, ensuring efficient UI rendering.
 
-   Methods: getPosts(userId?: number): Observable<Post[]>, getPost(id: number): Observable<Post>, getUser(id: number): Observable<User>, getComments(postId: number): Observable<Comment[]>.
+Singleton Service (PostsStoreService): All data that needs to be available in multiple components and cached is stored here. Components retrieve data from this service rather than making direct API calls.
 
-   PostsStoreService (Singleton):
+Zoneless Change Detection: The application utilizes provideZonelessChangeDetection() in app.config.ts for optimized and efficient UI rendering based on signals.
 
-   The central cache of the application.
+Asynchronicity: RxJS is used to handle HTTP requests and data streams, while HttpClient is used for API requests.
 
-   Stores post data in signals (posts: WritableSignal<Post[]>, favorites: WritableSignal<number[]>).
+## Additional Notes
 
-   Provides logic to check if post data is already available in memory. If so, it returns it from the signal. If not, it calls a method from PostsService and updates the signal.
+Filtering: Filtering by post content is implemented on the frontend. Filtering by user uses the userId parameter in the API request, and filtering by favorites is based on the state stored in PostsStoreService.
 
-   Data refresh only occurs when filters change or the page is reloaded.
+Animations: A slide-in animation is applied to the post list items, which re-triggers upon initial load and every time a filter is applied.
 
-   It will also manage the state of favorite posts.
-
-4. State Management Approach
-   State management will be based on two pillars:
-
-   Signals: Used to manage state within components (e.g., loading state, UI element visibility) and to store data in the singleton PostsStoreService. Thanks to signals, components will automatically react to state changes.
-
-   Singleton Service (PostsStoreService):
-
-   All data that needs to be available in multiple places and that needs to be cached will be stored in this service.
-
-   Components, instead of fetching data directly from the API, will retrieve it from PostsStoreService.
-
-   This service will decide whether a new API request is needed.
-
-   Favorite posts will be stored in a signal favorites: WritableSignal<number[]> within this service.
-
-   zoneless Architecture: Using provideZonelessChangeDetection() in main.ts will ensure optimization and efficient UI rendering based on signals.
-
-   Additional Notes:
-   Asynchronicity: We will use RxJS to handle HTTP requests and data streams, and HttpClient for API requests.
-
-   Filtering:
-
-   Filtering by post content (filter by content) will be implemented on the frontend side.
-
-   Filtering by user (filter by user) will use the userId parameter in the API request.
-
-   Filtering by favorites will be based on the state stored in PostsStoreService.
-
-   Animations: At least one transition animation (enter/leave) will be applied, e.g., for the post list container or the details view.
-
-   Responsiveness: The application will be fully responsive, using flexbox and responsive classes provided by TailwindCSS to ensure correct display on mobile and desktop devices.
+Responsiveness: The application is fully responsive, using Flexbox and Tailwind CSS to ensure correct display on all devices.
