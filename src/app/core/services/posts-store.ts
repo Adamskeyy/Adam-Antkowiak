@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Post } from '../../features/posts/posts.model';
+import { Post, PostDetailsModel } from '../../features/posts/posts.model';
 import { PostsService } from '../../features/posts/posts.service';
-import { take } from 'rxjs';
+import { finalize, Observable, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -40,5 +40,10 @@ export class PostsStoreService {
           this.loading.set(false);
         },
       });
+  }
+
+  public loadPostDetails(postId: number): Observable<PostDetailsModel> {
+    this.loading.set(true);
+    return this.postsService.getPostDetails(postId).pipe(finalize(() => this.loading.set(false)));
   }
 }

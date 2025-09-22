@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { delay, forkJoin, map, Observable, switchMap } from 'rxjs';
 import { Post, User, Comment } from './posts.model';
 
 @Injectable({
@@ -18,15 +18,21 @@ export class PostsService {
     return this.http.get<Post[]>(`${this.apiUrl}/posts`, { params });
   }
 
-  getPostDetails(postId: number): Observable<Post> {
-    return this.http.get<Post>(`${this.apiUrl}/posts/${postId}`);
-  }
-
-  getAuthor(userId: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/${userId}`);
-  }
-
-  getComments(postId: number): Observable<Comment[]> {
-    return this.http.get<Comment[]>(`${this.apiUrl}/posts/${postId}/comments`);
+  getPostDetails(postId: number): Observable<{ post: Post; author: User; comments: Comment[] }> {
+    return this.http.get<Post>(`${this.apiUrl}/posts/${postId}`).pipe(
+      delay(500), // showcase spinner
+      switchMap((post) => {
+        return forkJoin({
+          post: [post],
+          author: this.http.get<User>(`${this.apiUrl}/users/${post.userId}`),
+          comments: this.http.get<Comment[]>(`${this.apiUrl}/posts/${postId}/comments`),
+        });
+      }),
+      map((data) => ({
+        post: data.post,
+        author: data.author,
+        comments: data.comments,
+      })),
+    );
   }
 }
