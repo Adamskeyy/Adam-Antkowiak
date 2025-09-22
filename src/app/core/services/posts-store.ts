@@ -11,9 +11,17 @@ export class PostsStoreService {
 
   public posts = signal<Post[]>([]);
   public loading = signal<boolean>(false);
+  private lastFetchTimestamp = signal<number | null>(null);
 
   loadPosts(): void {
-    if (this.posts().length > 0) {
+    const now = Date.now();
+    const CACHE_LIFETIME = 5 * 60 * 1000;
+
+    if (
+      this.posts().length > 0 &&
+      this.lastFetchTimestamp() &&
+      now - this.lastFetchTimestamp()! < CACHE_LIFETIME
+    ) {
       return;
     }
 
@@ -24,10 +32,11 @@ export class PostsStoreService {
       .subscribe({
         next: (posts) => {
           this.posts.set(posts);
+          this.lastFetchTimestamp.set(now);
           this.loading.set(false);
         },
         error: (error) => {
-          console.error('Błąd podczas ładowania postów:', error);
+          console.error(error);
           this.loading.set(false);
         },
       });
