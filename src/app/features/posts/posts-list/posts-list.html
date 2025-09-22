@@ -1,1 +1,11 @@
-<p>posts-list works!</p>
+@if (loading()) {
+  <p>Loading...</p>
+}
+
+@if (!loading() && !posts().length) {
+  <p>Nothing to display</p>
+}
+
+@for (post of posts(); track post.id) {
+  <p>{{ post.title }}</p>
+}
