@@ -2,11 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { PostsStoreService } from '../../../core/services/posts-store';
+import { Loader } from '../../../shared/components/loader/loader';
 
 @Component({
   selector: 'app-posts-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, Loader],
   templateUrl: './posts-list.html',
 })
 export class PostsList implements OnInit {
