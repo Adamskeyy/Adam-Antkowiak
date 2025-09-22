@@ -3,6 +3,7 @@ export interface Post {
   id: number;
   title: string;
   body: string;
+  favorite: boolean;
 }
 
 export interface User {

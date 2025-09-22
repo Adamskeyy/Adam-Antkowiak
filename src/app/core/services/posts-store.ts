@@ -49,4 +49,8 @@ export class PostsStoreService {
     this.loading.set(true);
     return this.postsService.getPostDetails(postId).pipe(finalize(() => this.loading.set(false)));
   }
+
+  public updatePosts(updatedPosts: Post[]): void {
+    this.posts.set(updatedPosts);
+  }
 }

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { delay, forkJoin, map, Observable, switchMap } from 'rxjs';
-import { Post, User, Comment } from './posts.model';
+import { Post, User, Comment, PostDetailsModel } from './posts.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,10 +15,12 @@ export class PostsService {
     if (userId) {
       params = params.set('userId', userId.toString());
     }
-    return this.http.get<Post[]>(`${this.apiUrl}/posts`, { params });
+    return this.http
+      .get<Post[]>(`${this.apiUrl}/posts`, { params })
+      .pipe(map((posts) => posts.map((post) => ({ ...post, favorite: false }))));
   }
 
-  getPostDetails(postId: number): Observable<{ post: Post; author: User; comments: Comment[] }> {
+  getPostDetails(postId: number): Observable<PostDetailsModel> {
     return this.http.get<Post>(`${this.apiUrl}/posts/${postId}`).pipe(
       delay(500), // showcase spinner
       switchMap((post) => {

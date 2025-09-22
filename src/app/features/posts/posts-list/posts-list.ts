@@ -18,4 +18,17 @@ export class PostsList implements OnInit {
   ngOnInit(): void {
     this.postsStore.loadPosts();
   }
+
+  toggleFavorite(postId: number, event: MouseEvent): void {
+    event.stopPropagation();
+    const currentPosts = this.posts();
+    const updatedPosts = currentPosts.map((post) => {
+      if (post.id === postId) {
+        return { ...post, favorite: !post.favorite };
+      }
+      return post;
+    });
+
+    this.postsStore.updatePosts(updatedPosts);
+  }
 }
