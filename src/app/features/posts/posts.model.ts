@@ -36,3 +36,9 @@ export interface Comment {
   email: string;
   body: string;
 }
+
+export interface PostDetailsModel {
+  post: Post;
+  author: User;
+  comments: Comment[];
+}
