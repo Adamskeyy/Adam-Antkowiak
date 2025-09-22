@@ -27,7 +27,7 @@ export class PostDetails {
     ),
   );
 
-  public postDetailsData: Signal<PostDetailsModel | undefined> = toSignal(
+  public postDetailsData: Signal<PostDetailsModel | undefined | null> = toSignal(
     toObservable(this.postId).pipe(
       filter((id) => id !== undefined),
       switchMap((id) => this.postsStore.loadPostDetails(id as number)),

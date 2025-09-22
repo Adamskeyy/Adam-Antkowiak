@@ -50,13 +50,12 @@
           </div>
         }
       } @else {
-        <p class="text-gray-500">Brak komentarzy.</p>
+        <p class="text-gray-500">No comments.</p>
       }
     </div>
   } @else if (!loading()) {
-    <!-- Not Found -->
     <div class="flex justify-center items-center h-screen">
-      <p class="text-xl text-red-500">Post nie znaleziono.</p>
+      <p class="text-xl text-red-500">Post not found.</p>
     </div>
   }
 </div>
