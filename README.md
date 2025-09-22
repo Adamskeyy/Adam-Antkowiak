@@ -72,7 +72,7 @@ The application's state management is based on a modern, reactive approach:
 
 Signals: Signals are used to manage state within components (e.g., loading state, UI element visibility) and to store data in the singleton PostsStoreService. Components automatically react to state changes, ensuring efficient UI rendering.
 
-Singleton Service (PostsStoreService): All data that needs to be available in multiple components and cached is stored here. Components retrieve data from this service rather than making direct API calls.
+Singleton Service (PostsStoreService): All data that needs to be available in multiple components and cached is stored here. Components retrieve data from this service rather than making direct API calls. The service utilizes localStorage to save and load favorite post IDs, ensuring persistence across browser sessions.
 
 Zoneless Change Detection: The application utilizes provideZonelessChangeDetection() in app.config.ts for optimized and efficient UI rendering based on signals.
 
