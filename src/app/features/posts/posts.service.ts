@@ -10,8 +10,6 @@ export class PostsService {
   private http = inject(HttpClient);
   private apiUrl = 'https://jsonplaceholder.typicode.com';
 
-  constructor() {}
-
   getPosts(userId?: number): Observable<Post[]> {
     let params = new HttpParams();
     if (userId) {
