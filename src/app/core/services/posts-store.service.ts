@@ -72,10 +72,6 @@ export class PostsStoreService {
     return this.postsService.getPostDetails(postId).pipe(finalize(() => this.loading.set(false)));
   }
 
-  public updatePosts(updatedPosts: Post[]): void {
-    this.allPostsSignal.set(updatedPosts);
-  }
-
   public toggleFavorite(postId: number, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();

@@ -14,12 +14,31 @@ import { Loader } from '../../../shared/components/loader/loader';
 export class PostsList implements OnInit {
   protected readonly postsStore = inject(PostsStoreService);
   protected loading = this.postsStore.loading;
-  protected posts = this.postsStore.posts;
 
-  public isAnimating = signal(false);
+  protected isAnimating = signal(false);
+  protected posts = computed(() => {
+    if (this.isAnimating()) {
+      return [];
+    }
+    return this.postsStore.posts();
+  });
 
   ngOnInit(): void {
     this.postsStore.loadPosts();
+  }
+
+  toggleFavorite(postId: number, event: MouseEvent): void {
+    event.stopPropagation();
+
+    this.postsStore.toggleFavorite(postId);
+  }
+
+  public setSearchText(text: string): void {
+    this.postsStore.setSearchText(text);
+  }
+
+  public setUserIdFilter(userId: number | null): void {
+    this.postsStore.setUserIdFilter(userId);
   }
 
   public toggleFavoritesOnly(): void {

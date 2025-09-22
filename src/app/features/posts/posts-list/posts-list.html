@@ -6,14 +6,14 @@
       <input
         type="text"
         placeholder="Search posts..."
-        (input)="postsStore.setSearchText($event.target.value)"
+        (input)="setSearchText($event.target.value)"
         class="w-full sm:w-auto flex-grow px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
 
       <input
         type="number"
         placeholder="Filter by User ID..."
-        (input)="postsStore.setUserIdFilter(+$event.target.value)"
+        (input)="setUserIdFilter(+$event.target.value)"
         class="w-full sm:w-auto px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
 
@@ -39,7 +39,7 @@
   } @else {
     <div
       class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 enter-container"
-      [class.enter-animation]="isAnimating()"
+      animate.enter="enter-animation"
     >
       @for (post of posts(); track post.id) {
         <div
@@ -53,14 +53,16 @@
           <div class="flex justify-end mt-4">
             <button
               class="text-5xl cursor-pointer"
-              (click)="postsStore.toggleFavorite(post.id, $event)"
+              (click)="toggleFavorite(post.id, $event)"
               [class.text-yellow-400]="post.favorite"
             >
-              @if (post.favorite) {
-                <span>★</span>
-              } @else {
-                <span>☆</span>
-              }
+              <span [class.text-yellow-400]="post.favorite" class="hover:text-yellow-400">
+                @if (post.favorite) {
+                  <span>★</span>
+                } @else {
+                  <span>☆</span>
+                }
+              </span>
             </button>
           </div>
         </div>
