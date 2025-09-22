@@ -67,13 +67,22 @@ export class PostsStoreService {
       });
   }
 
-  public loadPostDetails(postId: number): Observable<PostDetailsModel> {
+  public loadPostDetails(postId: number): Observable<PostDetailsModel | null> {
     this.loading.set(true);
     return this.postsService.getPostDetails(postId).pipe(finalize(() => this.loading.set(false)));
   }
 
   public updatePosts(updatedPosts: Post[]): void {
     this.allPostsSignal.set(updatedPosts);
+  }
+
+  public toggleFavorite(postId: number, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.allPostsSignal.update((posts) =>
+      posts.map((post) => (post.id === postId ? { ...post, favorite: !post.favorite } : post)),
+    );
   }
 
   public setSearchText(text: string): void {
