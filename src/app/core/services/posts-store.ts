@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Post, PostDetailsModel } from '../../features/posts/posts.model';
 import { PostsService } from '../../features/posts/posts.service';
-import { finalize, Observable, take } from 'rxjs';
+import { delay, finalize, Observable, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +28,10 @@ export class PostsStoreService {
     this.loading.set(true);
     this.postsService
       .getPosts()
-      .pipe(take(1))
+      .pipe(
+        delay(300), // showcase spinner
+        take(1),
+      )
       .subscribe({
         next: (posts) => {
           this.posts.set(posts);
