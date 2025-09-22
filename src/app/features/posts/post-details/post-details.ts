@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PostDetailsModel } from '../posts.model';
 import { filter, switchMap } from 'rxjs/operators';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { PostsStoreService } from '../../../core/services/posts-store';
+import { PostsStoreService } from '../../../core/services/posts-store.service';
 import { Loader } from '../../../shared/components/loader/loader';
 
 @Component({
