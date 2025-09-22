@@ -11,7 +11,7 @@ src/
 │   │   ├── services/
 │   │   │   └── posts-store.service.ts  # Singleton for storing post data
 │   │   └── core.routes.ts
-│   ├── features/              # Lazy-loaded modules
+│   ├── features/              # Lazy-loaded module
 │   │   ├── posts/
 │   │   │   ├── posts-list/
 │   │   │   │   └── posts-list.component.ts
@@ -19,25 +19,18 @@ src/
 │   │   │   │   └── post-details.component.ts
 │   │   │   ├── posts.routes.ts
 │   │   │   └── posts.service.ts  # HTTP request handling
-│   │   └── favorites/
-│   │       ├── favorites.component.ts
-│   │       └── favorites.routes.ts
 │   ├── shared/                # Reusable components, pipes, and directives
 │   │   ├── components/
 │   │   │   ├── loader/
 │   │   │   │   └── loader.component.ts
-│   │   │   ├── post-card/
-│   │   │   │   └── post-card.component.ts
-│   │   │   ├── user-details/
-│   │   │   │   └── user-details.component.ts
 │   │   │   └── filter/
 │   │   │       └── filter.component.ts
 │   │   └── pipes/
 │   │       └── content-excerpt.pipe.ts
 │   ├── app.component.ts
 │   └── app.routes.ts
-├── environments/
-├── styles.css                # Global TailwindCSS styles
+├── index.html
+├── styles.css
 └── main.ts
 
 ```
