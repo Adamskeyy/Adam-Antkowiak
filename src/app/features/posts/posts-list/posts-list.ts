@@ -37,7 +37,9 @@ export class PostsList implements OnInit {
     this.postsStore.setSearchText(text);
   }
 
-  public setUserIdFilter(userId: number | null): void {
+  public onUserIdInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    const userId = value === '' ? null : +value;
     this.postsStore.setUserIdFilter(userId);
   }
 
